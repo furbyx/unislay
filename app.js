@@ -136,11 +136,11 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
 
-        // Get the current domain
-        const currentDomain = window.location.origin;
+        // Use relative path for API calls
+        const apiUrl = '/api/subscribe';
         
-        // Use the current domain for API calls
-        const response = await fetch(`${currentDomain}/api/subscribe`, {
+        console.log('Sending subscription request...');
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
