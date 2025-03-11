@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import nodemailer from 'nodemailer';
@@ -5,9 +6,10 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const app = express();
 
 // Enable CORS
 app.use(cors());
@@ -39,7 +41,7 @@ transporter.verify(function(error, success) {
 });
 
 // API endpoint for email subscription
-app.post('/api/subscribe', async (req, res) => {
+app.post('/subscribe', async (req, res) => {
     try {
         const { email } = req.body;
         
@@ -94,6 +96,12 @@ app.post('/api/subscribe', async (req, res) => {
         console.error('Subscription error:', error);
         res.status(500).json({ error: 'Server error', details: error.message });
     }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Server error:', err);
+    res.status(500).json({ error: 'Internal server error', details: err.message });
 });
 
 // Handle 404
