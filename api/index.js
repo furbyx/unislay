@@ -7,7 +7,7 @@ export default async function handler(req, res) {
         host: req.headers.host
     });
 
-    // Set CORS headers for www.unislay.com
+    // Set CORS headers specifically for www.unislay.com
     res.setHeader('Access-Control-Allow-Origin', 'https://www.unislay.com');
     res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -29,9 +29,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Email is required' });
         }
 
-        console.log('Creating email transporter...');
-
-        // Create transporter
+        // Create transporter with Gmail settings
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -40,13 +38,12 @@ export default async function handler(req, res) {
             }
         });
 
-        console.log('Testing email connection...');
-        await transporter.verify();
-        console.log('Email connection verified successfully');
-
-        console.log('Sending welcome email to:', email);
+        // Send email
         const info = await transporter.sendMail({
-            from: `"Unislay" <${process.env.EMAIL_USER}>`,
+            from: {
+                name: 'Unislay',
+                address: process.env.EMAIL_USER
+            },
             to: email,
             subject: 'Welcome to Unislay!',
             text: 'Welcome to Unislay! We are excited to have you join us.',
