@@ -1,10 +1,16 @@
 import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
-    // Basic CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Handle CORS for both development and production
+    const allowedOrigins = ['https://www.unislay.com', 'https://unislay.com'];
+    const origin = req.headers.origin;
+
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    
     res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
         res.status(200).end();
@@ -15,46 +21,67 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { email } = req.body;
-    if (!email) {
-        return res.status(400).json({ error: 'Email is required' });
-    }
-
     try {
-        // Create transporter
+        const { email } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required' });
+        }
+
+        // Create transporter with secure settings
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
+            service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASSWORD
-            },
-            debug: true,
-            logger: true
+            }
         });
+
+        // Verify connection
+        try {
+            await transporter.verify();
+            console.log('SMTP connection verified');
+        } catch (verifyError) {
+            console.error('SMTP verification failed:', verifyError);
+            return res.status(500).json({ 
+                error: 'Email configuration error',
+                details: verifyError.message 
+            });
+        }
 
         // Send email
         const info = await transporter.sendMail({
-            from: `"Unislay" <${process.env.EMAIL_USER}>`,
+            from: {
+                name: 'Unislay',
+                address: process.env.EMAIL_USER
+            },
             to: email,
-            subject: 'Welcome to Unislay!',
-            text: `Welcome to Unislay! We're excited to have you join us.`,
+            subject: 'Welcome to Unislay! Your College Journey Begins',
             html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h1 style="color: #FF4500;">Welcome to Unislay!</h1>
-                    <p>We're excited to have you join us.</p>
-                    <p>Stay tuned for updates!</p>
-                </div>
+                <!DOCTYPE html>
+                <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <h1 style="color: #FF4500; text-align: center;">Welcome to Unislay</h1>
+                        <p>Welcome to Unislay! We're excited to have you join us.</p>
+                        <p>We get it—college decisions can be overwhelming, and sorting through biased reviews and conflicting information only makes it tougher. We know how it feels to be stuck in this maze of opinions, unsure of which way to turn.</p>
+                        <p>That's exactly why we're here. We believe it's time to shake things up. While we're keeping the full details under wraps for now, trust that something truly game-changing is coming your way—a breakthrough that could redefine how you approach your college search.</p>
+                        <p>Stay tuned, and get ready for a fresh perspective. This is just the beginning of our journey together.</p>
+                        <p>Take care,<br><strong>The Unislay Team</strong></p>
+                    </div>
+                </body>
+                </html>
             `
         });
 
-        console.log('Message sent:', info.messageId);
-        return res.status(200).json({ success: true });
-
+        console.log('Email sent successfully:', info.messageId);
+        return res.status(200).json({
+            success: true,
+            message: 'Subscription successful'
+        });
     } catch (error) {
-        console.error('Error:', error);
-        return res.status(500).json({ 
+        console.error('Server error:', error);
+        return res.status(500).json({
             error: 'Failed to send email',
             details: error.message
         });
