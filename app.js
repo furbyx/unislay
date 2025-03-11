@@ -136,7 +136,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
 
-        // Use relative path for API calls
+        // Always use relative path for API calls
         const apiUrl = '/api/subscribe';
         
         console.log('Sending subscription request...');
