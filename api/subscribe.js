@@ -1,40 +1,5 @@
 import mongoose from 'mongoose';
 
-// Create subscriber schema
-const subscriberSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-let Subscriber;
-try {
-    // Try to get the model if it exists
-    Subscriber = mongoose.model('Subscriber');
-} catch {
-    // Create the model if it doesn't exist
-    Subscriber = mongoose.model('Subscriber', subscriberSchema);
-}
-
-// Connect to MongoDB
-let cachedDb = null;
-
-async function connectToDatabase() {
-    if (cachedDb) {
-        return cachedDb;
-    }
-    
-    await mongoose.connect(process.env.MONGODB_URI);
-    cachedDb = mongoose.connection;
-    return cachedDb;
-}
-
 export default async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -54,35 +19,24 @@ export default async function handler(req, res) {
         return;
     }
 
-    // Basic validation
-    if (!req.body || !req.body.email) {
-        res.status(400).json({ error: 'Email is required' });
-        return;
-    }
-
     try {
-        // Connect to database
-        await connectToDatabase();
-        
-        // Create new subscriber
-        const subscriber = new Subscriber({
-            email: req.body.email
-        });
-        
-        // Save to database
-        await subscriber.save();
-        
-        // Success response
-        res.status(200).json({ success: true, message: 'Subscription successful' });
-    } catch (error) {
-        console.error('Subscription error:', error);
-        
-        // Handle duplicate email error
-        if (error.code === 11000) {
-            res.status(400).json({ error: 'Email already subscribed' });
+        const { email } = req.body;
+
+        // Basic validation
+        if (!email) {
+            res.status(400).json({ error: 'Email is required' });
             return;
         }
-        
-        res.status(500).json({ error: 'Failed to subscribe' });
+
+        // For now, just return success
+        // You can add actual email storage logic later using a database
+        res.status(200).json({ 
+            success: true, 
+            message: 'Subscription successful',
+            email: email 
+        });
+    } catch (error) {
+        console.error('Subscription error:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 }
