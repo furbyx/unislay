@@ -1,13 +1,29 @@
-      "src": "/api/subscribe",
-      "dest": "api/index.js"
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
     },
     {
-      "src": "^/(.+\\.mp4)$",
-      "headers": {
-        "Content-Type": "video/mp4",
-        "Cache-Control": "public, max-age=31536000, immutable"
-      },
+      "src": "*.{html,css,js,mp4,png}",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/(.*)",
       "dest": "/$1"
-    },
-    {
-      "handle": "filesystem"
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "@mongodb_uri",
+    "EMAIL_USER": "@email_user",
+    "EMAIL_PASSWORD": "@email_password",
+    "DOMAIN": "https://www.unislay.com"
+  }
+}
