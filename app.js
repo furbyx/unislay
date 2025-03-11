@@ -136,7 +136,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
         
-        const response = await fetch('/api/subscribe', {
+        const response = await fetch('/subscribe', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -147,7 +147,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.message || 'Failed to subscribe');
+            throw new Error(data.error || data.message || 'Failed to subscribe');
         }
         
         emailInput.value = '';
