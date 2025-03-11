@@ -1,6 +1,3 @@
-import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
 import nodemailer from 'nodemailer';
 import fs from 'fs/promises';
 import path from 'path';
@@ -9,43 +6,41 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
-
-// Enable CORS with specific origin
-app.use(cors({
-    origin: ['http://localhost:3000', 'https://www.unislay.com'],
-    methods: ['POST'],
-    credentials: true
-}));
-
-// Parse JSON bodies
-app.use(express.json());
-
-// Configure nodemailer with secure settings
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    },
-    debug: true
-});
-
-// Verify SMTP connection on startup
-transporter.verify()
-    .then(() => {
-        console.log('SMTP server connection successful');
-    })
-    .catch((error) => {
-        console.error('SMTP connection error:', error);
+// Create reusable transporter
+const createTransporter = () => {
+    return nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        },
+        tls: {
+            ciphers: 'SSLv3'
+        }
     });
+};
 
-// API endpoint for email subscription
-app.post('/api/subscribe', async (req, res) => {
-    console.log('Received subscription request:', req.body);
-    
+export default async function handler(req, res) {
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.unislay.com');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Handle OPTIONS request for CORS
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    // Only allow POST requests
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     try {
         const { email } = req.body;
         
@@ -56,17 +51,15 @@ app.post('/api/subscribe', async (req, res) => {
 
         // Read email template
         const emailTemplatePath = path.join(__dirname, '..', 'email.html');
-        console.log('Reading email template from:', emailTemplatePath);
-        
         let emailTemplate;
+        
         try {
             emailTemplate = await fs.readFile(emailTemplatePath, 'utf8');
-            console.log('Email template loaded successfully');
         } catch (err) {
-            console.error('Error reading email template:', err);
-            return res.status(500).json({ error: 'Failed to read email template' });
+            console.error('Error reading template:', err);
+            return res.status(500).json({ error: 'Template error' });
         }
-        
+
         // Customize email template
         const subscriberName = email.split('@')[0]
             .split(/[._-]/)
@@ -76,12 +69,23 @@ app.post('/api/subscribe', async (req, res) => {
         const customizedTemplate = emailTemplate
             .replace("{{ Subscriber's Name }}", subscriberName)
             .replace(/logo\.png/g, 'https://i.ibb.co/ksXJzkmY/logo.png');
+
+        // Create and verify transporter
+        const transporter = createTransporter();
         
-        console.log('Email template customized for:', subscriberName);
-        
-        // Send welcome email with enhanced error handling
         try {
-            const mailOptions = {
+            await transporter.verify();
+        } catch (verifyError) {
+            console.error('SMTP Verification failed:', verifyError);
+            return res.status(500).json({ 
+                error: 'SMTP configuration error',
+                details: verifyError.message
+            });
+        }
+
+        // Send email
+        try {
+            const info = await transporter.sendMail({
                 from: {
                     name: 'Unislay',
                     address: process.env.EMAIL_USER
@@ -93,52 +97,32 @@ app.post('/api/subscribe', async (req, res) => {
                     'X-Priority': '1',
                     'X-MSMail-Priority': 'High'
                 }
-            };
-
-            console.log('Attempting to send email with options:', {
-                from: mailOptions.from,
-                to: mailOptions.to,
-                subject: mailOptions.subject
             });
 
-            const info = await transporter.sendMail(mailOptions);
-            console.log('Email sent successfully:', info.messageId);
-            
-            res.status(200).json({ 
-                success: true, 
+            console.log('Email sent:', info.messageId);
+            return res.status(200).json({ 
+                success: true,
                 message: 'Subscription successful',
                 messageId: info.messageId
             });
         } catch (emailError) {
-            console.error('Failed to send email:', {
-                error: emailError.message,
+            console.error('Email send error:', {
+                message: emailError.message,
                 code: emailError.code,
-                command: emailError.command,
                 response: emailError.response
             });
-
-            res.status(500).json({ 
-                error: 'Failed to send welcome email', 
+            
+            return res.status(500).json({
+                error: 'Failed to send email',
                 details: emailError.message,
-                code: emailError.code,
-                smtp: emailError.response
+                code: emailError.code
             });
         }
     } catch (error) {
         console.error('Server error:', error);
-        res.status(500).json({ error: 'Server error', details: error.message });
+        return res.status(500).json({ 
+            error: 'Server error',
+            details: error.message
+        });
     }
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Global error handler:', err);
-    res.status(500).json({ error: 'Internal server error', details: err.message });
-});
-
-// Handle 404
-app.use((req, res) => {
-    res.status(404).json({ error: 'Not found' });
-});
-
-export default app;
+}
