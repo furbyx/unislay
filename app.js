@@ -136,7 +136,10 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
         
-        const response = await fetch('/api/subscribe', {
+        // Determine if we're in production or development
+        const apiBaseUrl = window.location.hostname === 'localhost' ? '' : 'https://www.unislay.com';
+        
+        const response = await fetch(`${apiBaseUrl}/api/subscribe`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
