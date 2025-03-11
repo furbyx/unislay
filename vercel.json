@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.js",
+      "src": "api/*.js",
       "use": "@vercel/node"
     },
     {
@@ -12,13 +12,14 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "src": "/api/subscribe",
+      "methods": ["POST", "OPTIONS"],
       "headers": {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type"
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST, OPTIONS"
       },
-      "dest": "/api/index.js"
+      "dest": "/api/subscribe.js"
     },
     {
       "src": "^/(.+\\.mp4)$",
