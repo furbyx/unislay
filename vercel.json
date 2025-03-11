@@ -23,10 +23,10 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/$1",
-      "headers": {
-        "x-vercel-deployment": "true"
-      }
+      "dest": "/$1"
     }
-  ]
+  ],
+  "env": {
+    "DOMAIN": "https://www.unislay.com"
+  }
 }
