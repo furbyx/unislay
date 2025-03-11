@@ -136,15 +136,10 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
 
-        // Always use the absolute URL in production
-        const apiUrl = 'https://www.unislay.com/api/subscribe';
-
-        console.log('Sending subscription request...');
-        const response = await fetch(apiUrl, {
+        const response = await fetch('/api/subscribe', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Origin': 'https://www.unislay.com'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email })
         });
@@ -153,7 +148,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         console.log('Server response:', data);
 
         if (!response.ok) {
-            throw new Error(data.error || data.details || 'Failed to subscribe');
+            throw new Error(data.error || data.details || 'Subscription failed');
         }
 
         emailInput.value = '';
