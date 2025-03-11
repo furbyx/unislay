@@ -60,6 +60,8 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
     },
+    debug: true, // Enable debug logs
+    logger: true, // Enable built-in logger
     tls: {
         rejectUnauthorized: false
     }
@@ -73,6 +75,35 @@ transporter.verify(function(error, success) {
         console.log('Nodemailer server is ready to send emails');
     }
 });
+
+// Test email configuration immediately
+async function testEmailConfig() {
+    try {
+        console.log('Testing email configuration...');
+        console.log('Email User:', process.env.EMAIL_USER ? 'Set' : 'Not set');
+        console.log('Email Password:', process.env.EMAIL_PASSWORD ? 'Set' : 'Not set');
+        
+        const verifyResult = await transporter.verify();
+        console.log('Email verification result:', verifyResult);
+        
+        // Try to send a test email
+        const testResult = await transporter.sendMail({
+            from: {
+                name: 'Unislay Test',
+                address: process.env.EMAIL_USER
+            },
+            to: process.env.EMAIL_USER, // Send to yourself
+            subject: 'Unislay Email Test',
+            text: 'This is a test email from Unislay subscription system.'
+        });
+        console.log('Test email sent successfully:', testResult);
+    } catch (error) {
+        console.error('Email configuration test failed:', error);
+    }
+}
+
+// Run the test when the module loads
+testEmailConfig();
 
 export default async function handler(req, res) {
     // Enable CORS
@@ -115,39 +146,39 @@ export default async function handler(req, res) {
         // Create new subscriber
         const subscriber = new Subscriber({ email });
         await subscriber.save();
+        console.log('Subscriber saved to database:', email);
 
         try {
-            // Read and customize email template
-            console.log('Reading email template...');
-            const emailTemplatePath = path.join(__dirname, '..', 'email.html');
-            console.log('Email template path:', emailTemplatePath);
+            console.log('Starting email process for:', email);
+            console.log('Current directory:', __dirname);
             
-            const emailTemplate = await fs.readFile(emailTemplatePath, 'utf8');
-            console.log('Email template loaded successfully');
+            // Read and customize email template
+            const emailTemplatePath = path.join(__dirname, '..', 'email.html');
+            console.log('Looking for email template at:', emailTemplatePath);
+            
+            let emailTemplate;
+            try {
+                emailTemplate = await fs.readFile(emailTemplatePath, 'utf8');
+                console.log('Email template loaded, length:', emailTemplate.length);
+            } catch (templateError) {
+                console.error('Template read error:', templateError);
+                throw new Error(`Failed to read email template: ${templateError.message}`);
+            }
             
             const subscriberName = email.split('@')[0]
                 .split(/[._-]/)
                 .map(part => part.charAt(0).toUpperCase() + part.slice(1))
                 .join(' ');
-                
+            
             const customizedTemplate = emailTemplate
                 .replace('Subscriber', subscriberName)
                 .replace(/logo\.png/g, 'https://i.ibb.co/ksXJzkmY/logo.png');
+            
+            console.log('Template customized for:', subscriberName);
 
-            console.log('Attempting to send email...');
-            console.log('Email configuration:', {
-                from: process.env.EMAIL_USER,
-                to: email,
-                templateLength: customizedTemplate.length
-            });
-
-            // Verify email credentials
-            if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-                throw new Error('Email credentials are not configured');
-            }
-
-            // Send welcome email
-            await transporter.sendMail({
+            // Attempt to send email
+            console.log('Sending email to:', email);
+            const emailResult = await transporter.sendMail({
                 from: {
                     name: 'Unislay',
                     address: process.env.EMAIL_USER
@@ -156,15 +187,22 @@ export default async function handler(req, res) {
                 subject: 'Welcome to Unislay! Your College Journey Begins',
                 html: customizedTemplate
             });
-            console.log('Email sent successfully');
+            
+            console.log('Email sent successfully:', emailResult.messageId);
+            
         } catch (emailError) {
-            console.error('Email sending error:', emailError);
-            // Don't throw the error, just log it since we already saved to DB
-            // But do send a partial success response
+            console.error('Detailed email error:', {
+                name: emailError.name,
+                message: emailError.message,
+                stack: emailError.stack,
+                code: emailError.code,
+                command: emailError.command
+            });
+            
             return res.status(200).json({ 
                 success: true, 
-                message: 'Subscription successful but welcome email could not be sent',
-                emailError: process.env.NODE_ENV === 'development' ? emailError.message : 'Email sending failed'
+                message: 'Subscription saved but email failed',
+                error: emailError.message
             });
         }
 
