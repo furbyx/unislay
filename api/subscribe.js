@@ -53,10 +53,24 @@ async function connectToDatabase() {
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
+
+// Verify transporter configuration
+transporter.verify(function(error, success) {
+    if (error) {
+        console.error('Nodemailer verification error:', error);
+    } else {
+        console.log('Nodemailer server is ready to send emails');
     }
 });
 
@@ -102,33 +116,61 @@ export default async function handler(req, res) {
         const subscriber = new Subscriber({ email });
         await subscriber.save();
 
-        // Read and customize email template
-        const emailTemplatePath = path.join(__dirname, '..', 'email.html');
-        const emailTemplate = await fs.readFile(emailTemplatePath, 'utf8');
-        
-        const subscriberName = email.split('@')[0]
-            .split(/[._-]/)
-            .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-            .join(' ');
+        try {
+            // Read and customize email template
+            console.log('Reading email template...');
+            const emailTemplatePath = path.join(__dirname, '..', 'email.html');
+            console.log('Email template path:', emailTemplatePath);
             
-        const customizedTemplate = emailTemplate
-            .replace('Subscriber', subscriberName)
-            .replace(/logo\.png/g, 'https://i.ibb.co/ksXJzkmY/logo.png');
+            const emailTemplate = await fs.readFile(emailTemplatePath, 'utf8');
+            console.log('Email template loaded successfully');
+            
+            const subscriberName = email.split('@')[0]
+                .split(/[._-]/)
+                .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+                .join(' ');
+                
+            const customizedTemplate = emailTemplate
+                .replace('Subscriber', subscriberName)
+                .replace(/logo\.png/g, 'https://i.ibb.co/ksXJzkmY/logo.png');
 
-        // Send welcome email
-        await transporter.sendMail({
-            from: {
-                name: 'Unislay',
-                address: process.env.EMAIL_USER
-            },
-            to: email,
-            subject: 'Welcome to Unislay! Your College Journey Begins',
-            html: customizedTemplate
-        });
+            console.log('Attempting to send email...');
+            console.log('Email configuration:', {
+                from: process.env.EMAIL_USER,
+                to: email,
+                templateLength: customizedTemplate.length
+            });
+
+            // Verify email credentials
+            if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+                throw new Error('Email credentials are not configured');
+            }
+
+            // Send welcome email
+            await transporter.sendMail({
+                from: {
+                    name: 'Unislay',
+                    address: process.env.EMAIL_USER
+                },
+                to: email,
+                subject: 'Welcome to Unislay! Your College Journey Begins',
+                html: customizedTemplate
+            });
+            console.log('Email sent successfully');
+        } catch (emailError) {
+            console.error('Email sending error:', emailError);
+            // Don't throw the error, just log it since we already saved to DB
+            // But do send a partial success response
+            return res.status(200).json({ 
+                success: true, 
+                message: 'Subscription successful but welcome email could not be sent',
+                emailError: process.env.NODE_ENV === 'development' ? emailError.message : 'Email sending failed'
+            });
+        }
 
         res.status(200).json({ 
             success: true, 
-            message: 'Subscription successful'
+            message: 'Subscription successful and welcome email sent'
         });
     } catch (error) {
         console.error('Subscription error:', error);
