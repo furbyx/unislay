@@ -1,0 +1,617 @@
+:root {
+    --custom-cursor: url("/cursor.png"), auto;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: url('/cursor.png'), auto;
+}
+
+/* Apply custom cursor to all interactive elements */
+html, 
+body, 
+button, 
+input, 
+a, 
+.control-button, 
+.brutalist-input, 
+.video-container, 
+.content,
+.subscribe-container,
+.brutalist-container {
+    cursor: url('/cursor.png'), pointer;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: monospace;
+    position: fixed;
+}
+
+.video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+}
+
+#bgVideo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+}
+
+/* Desktop styles - centered */
+@media (min-width: 800px) {
+    #bgVideo {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100vw;
+        height: 100vh;
+        object-position: center;
+    }
+}
+
+/* Mobile styles - align from top */
+@media (max-width: 800px) {
+    body {
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .video-container {
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    #bgVideo {
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+
+    .content {
+        padding: 20px;
+        padding-bottom: 60px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .brutalist-container {
+        max-width: 280px;
+        margin-right: -1px;
+    }
+
+    .brutalist-input {
+        padding: 10px;
+        font-size: 14px;
+        box-shadow: 3px 3px 0 #000, 6px 6px 0 #FF4500;
+        border-width: 3px;
+        height: 42px;
+        border-right-width: 2px;
+    }
+
+    form {
+        gap: 0;
+        flex-wrap: nowrap;
+        width: 100%;
+        max-width: 400px;
+        align-items: stretch;
+        margin-bottom: 0;
+    }
+
+    form button {
+        padding: 0;
+        font-size: 14px;
+        box-shadow: 3px 3px 0 #000;
+        min-width: unset;
+        width: 42px;
+        height: 42px;
+        border-width: 3px;
+        border-left-width: 2px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        margin-left: -1px;
+    }
+
+    .button-text {
+        display: none !important;
+    }
+
+    .button-icon {
+        display: block !important;
+        width: 20px;
+        height: 20px;
+        color: #000;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    form button:hover {
+        transform: translate(-1px, -1px);
+        box-shadow: 4px 4px 0 #000;
+        z-index: 1;
+    }
+
+    form button:active {
+        transform: translate(1px, 1px);
+        box-shadow: 2px 2px 0 #000;
+    }
+
+    .gradient-overlay {
+        height: 15vh;
+    }
+
+    .subscribe-container {
+        width: 100%;
+        max-width: none;
+        padding: 0 10px;
+        box-sizing: border-box;
+        margin-bottom: 0;
+    }
+
+    .success-message {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 600px) {
+    .content {
+        padding: 15px;
+        padding-bottom: 40px;
+    }
+
+    form {
+        flex-direction: row;
+        gap: 0;
+        padding: 0;
+    }
+}
+
+@media (max-height: 500px) {
+    .content {
+        padding-bottom: 30px;
+    }
+
+    .gradient-overlay {
+        height: 12vh;
+    }
+
+    .brutalist-input {
+        height: 36px;
+    }
+
+    form button {
+        height: 36px;
+        width: 36px;
+    }
+
+    .button-icon {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 100vh;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    color: white;
+    text-align: center;
+    padding-bottom: 80px;
+}
+
+.gradient-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 25vh;
+    background: linear-gradient(to top, rgba(255, 69, 0, 0.6), transparent);
+    z-index: 1;
+}
+
+.subscribe-container {
+    position: relative;
+    z-index: 2;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease forwards;
+    
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.button-icon {
+    display: none;
+    width: 20px;
+    height: 20px;
+}
+
+form {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+form button {
+    background: #FF4500;
+    border: 4px solid #000;
+    color: #000;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: monospace;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 5px 5px 0 #000;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1;
+}
+
+form button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 #000;
+}
+
+form button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 #000;
+}
+
+.brutalist-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    font-family: monospace;
+
+}
+
+.brutalist-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+    background-color: #fff;
+    border: 4px solid #000;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 5px 5px 0 #000, 10px 10px 0 #FF4500;
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+.brutalist-input:focus {
+    animation: focus-pulse 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
+
+.brutalist-input:focus::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: white;
+    z-index: -1;
+}
+
+.brutalist-input:focus::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: -2;
+    clip-path: inset(0 100% 0 0);
+    animation: glitch-slice 4s steps(2, end) infinite;
+}
+
+@keyframes glitch-slice {
+    0% { clip-path: inset(0 100% 0 0); }
+    10% { clip-path: inset(0 5% 0 0); }
+    20% { clip-path: inset(0 80% 0 0); }
+    30% { clip-path: inset(0 10% 0 0); }
+    40% { clip-path: inset(0 50% 0 0); }
+    50% { clip-path: inset(0 30% 0 0); }
+    60% { clip-path: inset(0 70% 0 0); }
+    70% { clip-path: inset(0 15% 0 0); }
+    80% { clip-path: inset(0 90% 0 0); }
+    90% { clip-path: inset(0 5% 0 0); }
+    100% { clip-path: inset(0 100% 0 0); }
+}
+
+.brutalist-label {
+    position: absolute;
+    left: -3px;
+    top: -35px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #000;
+    padding: 5px 10px;
+    transform: rotate(-1deg);
+    z-index: 1;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.brutalist-input:focus + .brutalist-label {
+    transform: rotate(0deg) scale(1.05);
+    background-color: #FF4500;
+}
+
+.smooth-type::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0) 100%);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.smooth-type:focus::before {
+    opacity: 1;
+    animation: type-gradient 2s linear infinite;
+}
+
+@keyframes type-gradient {
+    0% { background-position: 300px 0; }
+    100% { background-position: 0 0; }
+}
+
+.brutalist-input::placeholder {
+    color: #888;
+    transition: color 0.3s ease;
+}
+
+.brutalist-input:focus::placeholder {
+    color: transparent;
+}
+
+@keyframes focus-pulse {
+    0%, 100% { border-color: #000; }
+    50% { border-color: #FF4500; }
+}
+
+button {
+    padding: 15px 30px;
+    border: 4px solid #000;
+    background-color: #FF4500;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: monospace;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 5px 5px 0 #000;
+    position: relative;
+}
+
+button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 #000;
+}
+
+button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 #000;
+}
+
+.success-message {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    background: #000;
+    color: #FF4500;
+    font-weight: bold;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.success-message.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 12px;
+    z-index: 10;
+}
+
+.control-button {
+    position: relative;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1.5px solid #fff;
+    min-width: 40px;
+    min-height: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+.control-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+.control-button svg {
+    width: 20px;
+    height: 20px;
+    stroke: #fff;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.control-button.show {
+    opacity: 1;
+}
+
+.replay-button {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.replay-button.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.unmute-button {
+    opacity: 1;
+}
+
+.unmute-button svg {
+    position: absolute;
+    transition: opacity 0.3s ease;
+}
+
+.unmute-button .muted-icon {
+    opacity: 0;
+}
+
+.unmute-button.muted .muted-icon {
+    opacity: 1;
+}
+
+.unmute-button.muted .unmuted-icon {
+    opacity: 0;
+}
+
+@media (max-width: 800px) {
+    .controls {
+        top: 15px;
+        right: 15px;
+        gap: 10px;
+    }
+
+    .control-button {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+    }
+
+    .control-button svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    form {
+        flex-direction: column;
+        gap: 0;
+        padding: 1.2rem;
+    }
+    
+    .subscribe-container {
+        padding: 0 1rem;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .brutalist-input {
+        font-size: 16px;
+    }
+}

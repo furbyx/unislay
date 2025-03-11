@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Unislay - Coming Soon</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="logo.png" type="image/x-icon">
+    <link rel="preload" href="cursor.png" as="image">
+    
+</head>
+<body>
+    <div class="controls">
+        <button type="button" id="replayButton" class="control-button replay-button" aria-label="Replay video">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-8 3.58-8 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6" stroke="white" stroke-width="1.5" fill="none"/>
+                <path d="M19.5 2v4h-4" stroke="white" stroke-width="1.5" fill="none"/>
+            </svg>
+        </button>
+        <button type="button" id="unmuteButton" class="control-button unmute-button" aria-label="Toggle sound">
+            <svg class="unmuted-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="white" stroke-width="1.5" fill="none"/>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="white" stroke-width="1.5" fill="none"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="white" stroke-width="1.5" fill="none"/>
+            </svg>
+            <svg class="muted-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="white" stroke-width="1.5" fill="none"/>
+                <path d="M23 9l-6 6" stroke="white" stroke-width="1.5" fill="none"/>
+                <path d="M17 9l6 6" stroke="white" stroke-width="1.5" fill="none"/>
+            </svg>
+        </button>
+    </div>
+    
+    <div class="video-container">
+        <video id="bgVideo" playsinline autoplay>
+            <source src="/background.mp4" type="video/mp4" media="all and (min-width: 801px)">
+            <source src="/background-mobile.mp4" type="video/mp4" media="all and (max-width: 800px) and (orientation: portrait)">
+            Your browser does not support the video tag.
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
+    <div class="content">
+        <div class="gradient-overlay"></div>
+        <div class="subscribe-container">
+            <form id="subscribeForm">
+                <div class="brutalist-container">
+                    <input type="email" id="email" class="brutalist-input smooth-type" placeholder="ENTER YOUR EMAIL" required>
+                    <label class="brutalist-label">COMING SOON</label>
+                </div>
+                <button type="submit">
+                    <span class="button-text">JOIN</span>
+                    <svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.1714 12L8.22168 7.04999L9.63589 5.63577L16 12L9.63589 18.3642L8.22168 16.95L13.1714 12Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </form>
+            <div class="success-message">Thanks for subscribing!</div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

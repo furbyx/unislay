@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Unislay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: monospace;
+        }
+        body {
+            line-height: 1.6;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            padding: 30px;
+            border: 2px solid #FF4500;
+            box-shadow: 5px 5px 0 #FF4500;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .logo img {
+            max-width: 150px;
+            height: auto;
+            border: 2px solid #FF4500;
+            padding: 10px;
+            background: #000;
+        }
+        h1 {
+            color: #FF4500;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0 #000;
+        }
+        p {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #fff;
+        }
+        .highlight {
+            color: #FF4500;
+            font-weight: bold;
+        }
+        .social-links {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #FF4500;
+        }
+        .social-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #FF4500;
+            color: #000;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 3px 3px 0 #000;
+        }
+        .social-links a:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #000;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+        }
+        .brutalist-box {
+            border: 2px solid #FF4500;
+            padding: 20px;
+            margin: 20px 0;
+            background: #000;
+            position: relative;
+        }
+        .brutalist-box::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: -5px;
+            bottom: -5px;
+            background: #FF4500;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://i.ibb.co/ksXJzkmY/logo.png" alt="Unislay Logo">
+        </div>
+        <div class="brutalist-box">
+            <h1>Welcome to Unislay</h1>
+            <p>Hey Subscriber,</p>
+            <p>Welcome to Unislay. We get it—college decisions can be overwhelming, and sorting through biased reviews and conflicting information only makes it tougher. We know how it feels to be stuck in this maze of opinions, unsure of which way to turn.</p>
+            <p>That's exactly why we're here. We believe it's time to shake things up. While we're keeping the full details under wraps for now, trust that something truly game-changing is coming your way—a breakthrough that could redefine how you approach your college search.</p>
+            <p>Stay tuned, and get ready for a fresh perspective. This is just the beginning of our journey together.</p>
+            <p>Take care,<br><span class="highlight">The Unislay Team</span></p>
+        </div>
+        
+        <div class="social-links">
+            <a href="https://unislay.com">Visit Unislay.com</a>
+        </div>
+        
+        <div class="footer">
+            <p> 2025 Unislay. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <!-- <a href="#" style="color: #FF4500; text-decoration: none;">Privacy Policy</a> | 
+                <a href="#" style="color: #FF4500; text-decoration: none;">Unsubscribe</a> -->
+            </p>
+        </div>
+    </div>
+</body>
+</html>
