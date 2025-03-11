@@ -136,10 +136,14 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
         
-        // Determine if we're in production or development
-        const apiBaseUrl = window.location.hostname === 'localhost' ? '' : 'https://www.unislay.com';
+        // Use the production URL when not on localhost
+        const isProduction = window.location.hostname !== 'localhost';
+        const apiBaseUrl = isProduction ? 'https://www.unislay.com' : '';
+        const apiUrl = `${apiBaseUrl}/api/subscribe`;
         
-        const response = await fetch(`${apiBaseUrl}/api/subscribe`, {
+        console.log('Sending subscription request to:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -148,9 +152,14 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         });
         
         const data = await response.json();
+        console.log('Server response:', data);
         
         if (!response.ok) {
-            throw new Error(data.error || data.message || 'Failed to subscribe');
+            let errorMessage = data.error || data.message || 'Failed to subscribe';
+            if (data.details) {
+                errorMessage += `: ${data.details}`;
+            }
+            throw new Error(errorMessage);
         }
         
         emailInput.value = '';
