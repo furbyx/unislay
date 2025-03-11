@@ -39,30 +39,50 @@ try {
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    requireTLS: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
+    },
+    tls: {
+        ciphers: 'SSLv3',
+        rejectUnauthorized: false
     }
 });
 
 // Test email configuration
 async function testEmailConfig() {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-        console.error('Email credentials missing');
+        console.error('Email configuration error: Missing credentials');
+        console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'Set' : 'Not set');
+        console.log('EMAIL_PASSWORD:', process.env.EMAIL_PASSWORD ? 'Set' : 'Not set');
         return;
     }
-    
+
     try {
-        const testResult = await transporter.sendMail({
+        console.log('Testing SMTP connection...');
+        await transporter.verify();
+        console.log('SMTP connection successful');
+        
+        console.log('Sending test email...');
+        const info = await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
-            subject: 'Unislay Test',
-            text: 'Email system working'
+            subject: 'Test Email',
+            text: 'This is a test email to verify the system is working.',
+            html: '<p>This is a test email to verify the system is working.</p>'
         });
-        console.log('Test email sent:', testResult.messageId);
+        console.log('Test email sent:', info.messageId);
     } catch (error) {
-        console.error('Email error:', error.message);
+        console.error('Email test failed:', {
+            name: error.name,
+            message: error.message,
+            code: error.code,
+            command: error.command
+        });
     }
 }
 
@@ -142,18 +162,29 @@ app.post('/api/subscribe', async (req, res) => {
             console.log('Template customized for:', subscriberName);
 
             // Send welcome email
-            console.log('Sending email to:', email);
-            const emailResult = await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: email,
-                subject: 'Welcome to Unislay! Your College Journey Begins',
-                html: customizedTemplate,
-                headers: {
-                    'X-Entity-Ref-ID': new Date().getTime()
-                }
-            });
-            
-            console.log('Email sent successfully:', emailResult.messageId);
+            console.log('Attempting to send email to:', email);
+            try {
+                const emailResult = await transporter.sendMail({
+                    from: {
+                        name: 'Unislay',
+                        address: process.env.EMAIL_USER
+                    },
+                    to: email,
+                    subject: 'Welcome to Unislay! Your College Journey Begins',
+                    html: customizedTemplate,
+                    headers: {
+                        'X-Entity-Ref-ID': new Date().getTime()
+                    }
+                });
+                console.log('Email sent successfully:', emailResult.messageId);
+            } catch (emailError) {
+                console.error('Email sending failed:', {
+                    error: emailError.message,
+                    code: emailError.code,
+                    response: emailError.response
+                });
+                throw new Error('Failed to send welcome email. Please try again.');
+            }
             
             res.status(200).json({ 
                 success: true, 
