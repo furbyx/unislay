@@ -43,7 +43,7 @@ app.post('/api/subscribe', async (req, res) => {
             console.log('Email template loaded successfully');
         } catch (err) {
             console.error('Error reading email template:', err);
-            throw new Error('Failed to read email template');
+            return res.status(500).json({ error: 'Failed to read email template' });
         }
         
         // Customize email template
@@ -53,20 +53,28 @@ app.post('/api/subscribe', async (req, res) => {
             .join(' ');
             
         const customizedTemplate = emailTemplate
-            .replace('[Subscriber\'s Name]', subscriberName)
+            .replace('Subscriber', subscriberName)
             .replace(/logo\.png/g, 'https://i.ibb.co/ksXJzkmY/logo.png');
         
         console.log('Sending email to:', email);
         
         // Send welcome email
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Welcome to Unislay! Your College Journey Begins',
-            html: customizedTemplate
-        });
+        try {
+            await transporter.sendMail({
+                from: {
+                    name: 'Unislay',
+                    address: process.env.EMAIL_USER
+                },
+                to: email,
+                subject: 'Welcome to Unislay! Your College Journey Begins',
+                html: customizedTemplate
+            });
+            console.log('Email sent successfully');
+        } catch (err) {
+            console.error('Error sending email:', err);
+            return res.status(500).json({ error: 'Failed to send email' });
+        }
         
-        console.log('Email sent successfully');
         res.status(200).json({ success: true, message: 'Subscription successful' });
     } catch (error) {
         console.error('Subscription error:', error);
