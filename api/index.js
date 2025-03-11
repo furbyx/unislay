@@ -39,42 +39,34 @@ try {
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
-    },
-    debug: true,
-    logger: true
+    }
 });
 
 // Test email configuration
 async function testEmailConfig() {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        console.error('Email credentials missing');
+        return;
+    }
+    
     try {
-        console.log('Testing email configuration...');
-        console.log('Email User:', process.env.EMAIL_USER ? 'Set' : 'Not set');
-        console.log('Email Password:', process.env.EMAIL_PASSWORD ? 'Set' : 'Not set');
-        
-        const verifyResult = await transporter.verify();
-        console.log('Email verification result:', verifyResult);
-        
-        // Send test email
         const testResult = await transporter.sendMail({
-            from: {
-                name: 'Unislay Test',
-                address: process.env.EMAIL_USER
-            },
+            from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
-            subject: 'Unislay Email Test',
-            text: 'This is a test email from Unislay subscription system.'
+            subject: 'Unislay Test',
+            text: 'Email system working'
         });
-        console.log('Test email sent successfully:', testResult);
+        console.log('Test email sent:', testResult.messageId);
     } catch (error) {
-        console.error('Email configuration test failed:', error);
+        console.error('Email error:', error.message);
     }
 }
+
+testEmailConfig();
 
 // Connect to MongoDB
 async function connectToDatabase() {
@@ -98,9 +90,6 @@ async function connectToDatabase() {
         throw error;
     }
 }
-
-// Run initial tests
-testEmailConfig();
 
 // API endpoint for email subscription
 app.post('/api/subscribe', async (req, res) => {
@@ -155,13 +144,13 @@ app.post('/api/subscribe', async (req, res) => {
             // Send welcome email
             console.log('Sending email to:', email);
             const emailResult = await transporter.sendMail({
-                from: {
-                    name: 'Unislay',
-                    address: process.env.EMAIL_USER
-                },
+                from: process.env.EMAIL_USER,
                 to: email,
                 subject: 'Welcome to Unislay! Your College Journey Begins',
-                html: customizedTemplate
+                html: customizedTemplate,
+                headers: {
+                    'X-Entity-Ref-ID': new Date().getTime()
+                }
             });
             
             console.log('Email sent successfully:', emailResult.messageId);
