@@ -12,7 +12,7 @@
   ],
   "routes": [
     {
-      "src": "/api/subscribe",
+      "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
     {
@@ -30,5 +30,11 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ]
+  ],
+  "env": {
+    "MONGODB_URI": "@mongodb_uri",
+    "EMAIL_USER": "@email_user",
+    "EMAIL_PASSWORD": "@email_password",
+    "DOMAIN": "https://www.unislay.com"
+  }
 }
