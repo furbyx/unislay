@@ -35,7 +35,7 @@ async function connectToDatabase() {
     return cachedDb;
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -60,6 +60,29 @@ export default function handler(req, res) {
         return;
     }
 
-    // Success response
-    res.status(200).json({ success: true, message: 'Subscription successful' });
+    try {
+        // Connect to database
+        await connectToDatabase();
+        
+        // Create new subscriber
+        const subscriber = new Subscriber({
+            email: req.body.email
+        });
+        
+        // Save to database
+        await subscriber.save();
+        
+        // Success response
+        res.status(200).json({ success: true, message: 'Subscription successful' });
+    } catch (error) {
+        console.error('Subscription error:', error);
+        
+        // Handle duplicate email error
+        if (error.code === 11000) {
+            res.status(400).json({ error: 'Email already subscribed' });
+            return;
+        }
+        
+        res.status(500).json({ error: 'Failed to subscribe' });
+    }
 }
