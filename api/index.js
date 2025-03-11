@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
-    // Handle CORS for both development and production
+    // Handle CORS
     const allowedOrigins = ['https://www.unislay.com', 'https://unislay.com'];
     const origin = req.headers.origin;
 
@@ -28,12 +28,24 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Email is required' });
         }
 
+        // Log environment variables (without exposing sensitive data)
+        console.log('Email configuration:', {
+            hasUser: !!process.env.EMAIL_USER,
+            hasPassword: !!process.env.EMAIL_PASSWORD
+        });
+
         // Create transporter with secure settings
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // use SSL
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASSWORD
+            },
+            tls: {
+                // do not fail on invalid certs
+                rejectUnauthorized: false
             }
         });
 
