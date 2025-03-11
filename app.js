@@ -147,7 +147,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.message || 'Failed to subscribe');
+            throw new Error(data.error || 'Failed to subscribe');
         }
         
         emailInput.value = '';
