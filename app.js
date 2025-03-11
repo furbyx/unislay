@@ -136,14 +136,15 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
 
-        const apiUrl = window.location.hostname === 'localhost' 
-            ? '/api/subscribe'
-            : 'https://www.unislay.com/api/subscribe';
+        // Always use the absolute URL in production
+        const apiUrl = 'https://www.unislay.com/api/subscribe';
 
+        console.log('Sending subscription request...');
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Origin': 'https://www.unislay.com'
             },
             body: JSON.stringify({ email })
         });
@@ -152,7 +153,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         console.log('Server response:', data);
 
         if (!response.ok) {
-            throw new Error(data.error || 'Failed to subscribe');
+            throw new Error(data.error || data.details || 'Failed to subscribe');
         }
 
         emailInput.value = '';
@@ -162,7 +163,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         }, 3000);
     } catch (error) {
         console.error('Subscription error:', error);
-        alert('Failed to subscribe. Please try again later.');
+        alert(error.message || 'Failed to subscribe. Please try again later.');
     } finally {
         submitButton.disabled = false;
         buttonText.textContent = 'JOIN';
