@@ -19,26 +19,21 @@ app.use(express.json());
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
-    },
-    tls: {
-        rejectUnauthorized: false
     }
 });
 
-// Verify SMTP connection
-transporter.verify(function(error, success) {
-    if (error) {
-        console.error('SMTP connection error:', error);
-    } else {
+// Verify SMTP connection on startup
+transporter.verify()
+    .then(() => {
         console.log('SMTP server is ready to send emails');
-    }
-});
+    })
+    .catch((error) => {
+        console.error('SMTP connection error:', error);
+    });
 
 // API endpoint for email subscription
 app.post('/api/subscribe', async (req, res) => {
@@ -69,28 +64,55 @@ app.post('/api/subscribe', async (req, res) => {
             .join(' ');
             
         const customizedTemplate = emailTemplate
-            .replace('[Subscriber\'s Name]', subscriberName)
+            .replace("{{ Subscriber's Name }}", subscriberName)
             .replace(/logo\.png/g, 'https://i.ibb.co/ksXJzkmY/logo.png');
         
+        console.log('Email template customized with name:', subscriberName);
         console.log('Attempting to send email to:', email);
         
-        // Send welcome email
+        // Send welcome email with better error handling
         try {
-            await transporter.sendMail({
+            const mailOptions = {
                 from: {
                     name: 'Unislay',
                     address: process.env.EMAIL_USER
                 },
                 to: email,
                 subject: 'Welcome to Unislay! Your College Journey Begins',
-                html: customizedTemplate
+                html: customizedTemplate,
+                headers: {
+                    'X-Priority': '1',
+                    'X-MSMail-Priority': 'High'
+                }
+            };
+
+            console.log('Mail options configured:', {
+                from: mailOptions.from,
+                to: mailOptions.to,
+                subject: mailOptions.subject
             });
-            
+
+            await transporter.sendMail(mailOptions);
             console.log('Email sent successfully to:', email);
             res.status(200).json({ success: true, message: 'Subscription successful' });
         } catch (emailError) {
             console.error('Failed to send email:', emailError);
-            res.status(500).json({ error: 'Failed to send welcome email', details: emailError.message });
+            // Log specific error details for debugging
+            if (emailError.response) {
+                console.error('SMTP Response:', emailError.response);
+            }
+            if (emailError.code) {
+                console.error('Error Code:', emailError.code);
+            }
+            if (emailError.command) {
+                console.error('SMTP Command:', emailError.command);
+            }
+            res.status(500).json({ 
+                error: 'Failed to send welcome email', 
+                details: emailError.message,
+                smtp: emailError.response,
+                code: emailError.code
+            });
         }
     } catch (error) {
         console.error('Subscription error:', error);
