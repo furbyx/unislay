@@ -7,8 +7,8 @@ export default async function handler(req, res) {
         host: req.headers.host
     });
 
-    // Handle CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Set CORS headers for www.unislay.com
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.unislay.com');
     res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
