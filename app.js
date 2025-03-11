@@ -135,27 +135,21 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
     try {
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
-
-        // Always use relative path for API calls
-        const apiUrl = '/api/subscribe';
         
-        console.log('Sending subscription request...');
-        const response = await fetch(apiUrl, {
+        const response = await fetch('/api/subscribe', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email }),
-            credentials: 'same-origin'
+            body: JSON.stringify({ email })
         });
-
+        
         const data = await response.json();
-        console.log('Server response:', data);
-
+        
         if (!response.ok) {
-            throw new Error(data.error || data.details || 'Failed to subscribe');
+            throw new Error(data.message || 'Failed to subscribe');
         }
-
+        
         emailInput.value = '';
         successMessage.classList.add('show');
         setTimeout(() => {
@@ -163,7 +157,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         }, 3000);
     } catch (error) {
         console.error('Subscription error:', error);
-        alert(error.message || 'Failed to subscribe. Please try again later.');
+        alert(error.message || 'Failed to subscribe. Please try again.');
     } finally {
         submitButton.disabled = false;
         buttonText.textContent = 'JOIN';
