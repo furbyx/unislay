@@ -13,6 +13,12 @@
   "routes": [
     {
       "src": "/api/(.*)",
+      "headers": {
+        "Access-Control-Allow-Origin": "https://www.unislay.com",
+        "Access-Control-Allow-Methods": "POST,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Credentials": "true"
+      },
       "dest": "/api/index.js"
     },
     {
@@ -22,6 +28,7 @@
   ],
   "env": {
     "EMAIL_USER": "@email_user",
-    "EMAIL_PASSWORD": "@email_password"
+    "EMAIL_PASSWORD": "@email_password",
+    "VERCEL_URL": "https://www.unislay.com"
   }
 }
