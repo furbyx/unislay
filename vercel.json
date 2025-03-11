@@ -13,20 +13,22 @@
   "routes": [
     {
       "src": "/api/(.*)",
+      "dest": "api/index.js"
+    },
+    {
+      "src": "^/(.+\\.mp4)$",
       "headers": {
-        "Access-Control-Allow-Origin": "https://www.unislay.com",
-        "Access-Control-Allow-Methods": "POST,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Credentials": "true"
+        "Content-Type": "video/mp4",
+        "Cache-Control": "public, max-age=31536000, immutable"
       },
-      "dest": "/api/index.js"
+      "dest": "/$1"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "env": {
-    "DOMAIN": "https://www.unislay.com"
-  }
+  ]
 }
