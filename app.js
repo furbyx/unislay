@@ -136,7 +136,11 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
 
-        const response = await fetch('/api/subscribe', {
+        // Get the current domain
+        const currentDomain = window.location.origin;
+        
+        // Use the current domain for API calls
+        const response = await fetch(`${currentDomain}/api/subscribe`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
