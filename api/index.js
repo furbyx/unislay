@@ -11,25 +11,32 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Enable CORS
-app.use(cors());
+// Enable CORS with specific origin
+app.use(cors({
+    origin: ['http://localhost:3000', 'https://www.unislay.com'],
+    methods: ['POST'],
+    credentials: true
+}));
 
 // Parse JSON bodies
 app.use(express.json());
 
-// Configure nodemailer
+// Configure nodemailer with secure settings
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
-    }
+    },
+    debug: true
 });
 
 // Verify SMTP connection on startup
 transporter.verify()
     .then(() => {
-        console.log('SMTP server is ready to send emails');
+        console.log('SMTP server connection successful');
     })
     .catch((error) => {
         console.error('SMTP connection error:', error);
@@ -37,10 +44,13 @@ transporter.verify()
 
 // API endpoint for email subscription
 app.post('/api/subscribe', async (req, res) => {
+    console.log('Received subscription request:', req.body);
+    
     try {
         const { email } = req.body;
         
         if (!email) {
+            console.log('Email missing in request');
             return res.status(400).json({ error: 'Email is required' });
         }
 
@@ -67,10 +77,9 @@ app.post('/api/subscribe', async (req, res) => {
             .replace("{{ Subscriber's Name }}", subscriberName)
             .replace(/logo\.png/g, 'https://i.ibb.co/ksXJzkmY/logo.png');
         
-        console.log('Email template customized with name:', subscriberName);
-        console.log('Attempting to send email to:', email);
+        console.log('Email template customized for:', subscriberName);
         
-        // Send welcome email with better error handling
+        // Send welcome email with enhanced error handling
         try {
             const mailOptions = {
                 from: {
@@ -86,43 +95,44 @@ app.post('/api/subscribe', async (req, res) => {
                 }
             };
 
-            console.log('Mail options configured:', {
+            console.log('Attempting to send email with options:', {
                 from: mailOptions.from,
                 to: mailOptions.to,
                 subject: mailOptions.subject
             });
 
-            await transporter.sendMail(mailOptions);
-            console.log('Email sent successfully to:', email);
-            res.status(200).json({ success: true, message: 'Subscription successful' });
+            const info = await transporter.sendMail(mailOptions);
+            console.log('Email sent successfully:', info.messageId);
+            
+            res.status(200).json({ 
+                success: true, 
+                message: 'Subscription successful',
+                messageId: info.messageId
+            });
         } catch (emailError) {
-            console.error('Failed to send email:', emailError);
-            // Log specific error details for debugging
-            if (emailError.response) {
-                console.error('SMTP Response:', emailError.response);
-            }
-            if (emailError.code) {
-                console.error('Error Code:', emailError.code);
-            }
-            if (emailError.command) {
-                console.error('SMTP Command:', emailError.command);
-            }
+            console.error('Failed to send email:', {
+                error: emailError.message,
+                code: emailError.code,
+                command: emailError.command,
+                response: emailError.response
+            });
+
             res.status(500).json({ 
                 error: 'Failed to send welcome email', 
                 details: emailError.message,
-                smtp: emailError.response,
-                code: emailError.code
+                code: emailError.code,
+                smtp: emailError.response
             });
         }
     } catch (error) {
-        console.error('Subscription error:', error);
+        console.error('Server error:', error);
         res.status(500).json({ error: 'Server error', details: error.message });
     }
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error('Server error:', err);
+    console.error('Global error handler:', err);
     res.status(500).json({ error: 'Internal server error', details: err.message });
 });
 
