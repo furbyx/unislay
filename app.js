@@ -136,9 +136,11 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
 
-        // Use relative path for API calls
-        const apiUrl = '/api/subscribe';
-        
+        // Get the current domain
+        const apiUrl = window.location.hostname === 'localhost' 
+            ? '/api/subscribe'
+            : 'https://www.unislay.com/api/subscribe';
+
         console.log('Sending subscription request...');
         const response = await fetch(apiUrl, {
             method: 'POST',
@@ -148,12 +150,13 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
             body: JSON.stringify({ email })
         });
 
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || data.details || 'Failed to subscribe');
+        }
+
         const data = await response.json();
         console.log('Server response:', data);
-
-        if (!response.ok) {
-            throw new Error(data.error || data.details || 'Subscription failed');
-        }
 
         emailInput.value = '';
         successMessage.classList.add('show');
