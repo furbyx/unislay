@@ -136,6 +136,10 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
         
+        if (!email || !email.includes('@')) {
+            throw new Error('Please enter a valid email address');
+        }
+
         const response = await fetch('/api/subscribe', {
             method: 'POST',
             headers: {
@@ -143,12 +147,18 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
             },
             body: JSON.stringify({ email })
         });
+
+        if (!response.ok) {
+            const errorData = await response.text();
+            try {
+                const jsonError = JSON.parse(errorData);
+                throw new Error(jsonError.error || 'Failed to subscribe');
+            } catch (parseError) {
+                throw new Error('Failed to subscribe. Please try again.');
+            }
+        }
         
         const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || 'Failed to subscribe');
-        }
         
         emailInput.value = '';
         successMessage.classList.add('show');
