@@ -136,14 +136,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
         
-        // Use the production URL when not on localhost
-        const isProduction = window.location.hostname !== 'localhost';
-        const apiBaseUrl = isProduction ? 'https://www.unislay.com' : '';
-        const apiUrl = `${apiBaseUrl}/api/subscribe`;
-        
-        console.log('Sending subscription request to:', apiUrl);
-        
-        const response = await fetch(apiUrl, {
+        const response = await fetch('/api/subscribe', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -152,14 +145,9 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         });
         
         const data = await response.json();
-        console.log('Server response:', data);
         
         if (!response.ok) {
-            let errorMessage = data.error || data.message || 'Failed to subscribe';
-            if (data.details) {
-                errorMessage += `: ${data.details}`;
-            }
-            throw new Error(errorMessage);
+            throw new Error(data.error || 'Subscription failed');
         }
         
         emailInput.value = '';
@@ -169,7 +157,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         }, 3000);
     } catch (error) {
         console.error('Subscription error:', error);
-        alert(error.message || 'Failed to subscribe. Please try again.');
+        alert('Failed to subscribe. Please try again later.');
     } finally {
         submitButton.disabled = false;
         buttonText.textContent = 'JOIN';
