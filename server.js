@@ -15,7 +15,7 @@ const port = process.env.PORT || 3000;
 
 // Configure CORS
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:52811'],
+    origin: ['http://localhost:3000', 'http://127.0.0.1:52811', 'https://www.unislay.com'],
     methods: ['GET', 'POST'],
     credentials: true
 }));
@@ -29,10 +29,17 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// Connect to MongoDB with proper error handling
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => {
+    console.log('Connected to MongoDB');
+})
+.catch(err => {
+    console.error('MongoDB connection error:', err);
+});
 
 // Create subscriber schema
 const subscriberSchema = new mongoose.Schema({
