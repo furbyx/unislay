@@ -16,8 +16,13 @@
       "headers": {
         "Access-Control-Allow-Origin": "https://www.unislay.com",
         "Access-Control-Allow-Methods": "POST,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type"
+        "Access-Control-Allow-Headers": "Content-Type,Origin",
+        "Access-Control-Allow-Credentials": "true"
       },
+      "continue": true
+    },
+    {
+      "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
     {
