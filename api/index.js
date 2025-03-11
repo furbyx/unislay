@@ -2,13 +2,7 @@ import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
     // Handle CORS
-    const allowedOrigins = ['https://www.unislay.com', 'https://unislay.com'];
-    const origin = req.headers.origin;
-
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.unislay.com');
     res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -42,24 +36,8 @@ export default async function handler(req, res) {
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASSWORD
-            },
-            tls: {
-                // do not fail on invalid certs
-                rejectUnauthorized: false
             }
         });
-
-        // Verify connection
-        try {
-            await transporter.verify();
-            console.log('SMTP connection verified');
-        } catch (verifyError) {
-            console.error('SMTP verification failed:', verifyError);
-            return res.status(500).json({ 
-                error: 'Email configuration error',
-                details: verifyError.message 
-            });
-        }
 
         // Send email
         const info = await transporter.sendMail({
