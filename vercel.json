@@ -25,10 +25,5 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "env": {
-    "EMAIL_USER": "@email_user",
-    "EMAIL_PASSWORD": "@email_password",
-    "VERCEL_URL": "https://www.unislay.com"
-  }
+  ]
 }
