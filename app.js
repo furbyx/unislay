@@ -135,21 +135,26 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
     try {
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
-        
-        const response = await fetch('/api/subscribe', {
+
+        const apiUrl = window.location.hostname === 'localhost' 
+            ? '/api/subscribe'
+            : 'https://www.unislay.com/api/subscribe';
+
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email })
         });
-        
+
         const data = await response.json();
-        
+        console.log('Server response:', data);
+
         if (!response.ok) {
-            throw new Error(data.error || 'Subscription failed');
+            throw new Error(data.error || 'Failed to subscribe');
         }
-        
+
         emailInput.value = '';
         successMessage.classList.add('show');
         setTimeout(() => {
