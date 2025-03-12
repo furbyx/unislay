@@ -1,11 +1,13 @@
+
 {
   "name": "unislay-coming-soon",
   "version": "1.0.0",
   "type": "module",
   "description": "Coming soon page with video background",
-  "main": "server.js",
+  "main": "api/index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node api/index.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
