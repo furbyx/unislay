@@ -15,7 +15,7 @@ const port = process.env.PORT || 3000;
 
 // Configure CORS
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:52811'],
+    origin: ['http://localhost:3000', 'http://127.0.0.1:52811', 'https://unislaycomingsoon.vercel.app'],
     methods: ['GET', 'POST'],
     credentials: true
 }));
@@ -38,10 +38,21 @@ transporter.verify()
         console.error('Email configuration error:', error);
     });
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// Connect to MongoDB with improved error handling
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => {
+    console.error('MongoDB connection error:', err.message);
+    if (err.message.includes('invalid username')) {
+        console.error('Authentication failed - please check username and password');
+    }
+    if (err.message.includes('@') && err.message.includes('mongodb+srv')) {
+        console.error('Connection string may contain unescaped special characters');
+    }
+});
 
 // Create subscriber schema
 const subscriberSchema = new mongoose.Schema({
@@ -77,7 +88,7 @@ app.post('/api/subscribe', async (req, res) => {
         await subscriber.save();
 
         // Read email template
-        const emailTemplatePath = path.join(__dirname, 'email.html');
+        const emailTemplatePath = path.join(process.cwd(), 'email.html');
         console.log('Reading email template from:', emailTemplatePath);
         
         let emailTemplate;
