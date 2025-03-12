@@ -1,12 +1,13 @@
+
 :root {
-    --custom-cursor: url("/cursor.png"), auto;
+    --custom-cursor: url("/cursor.png") 2 2, auto;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    cursor: url('/cursor.png'), auto;
+    cursor: var(--custom-cursor);
 }
 
 /* Apply custom cursor to all interactive elements */
@@ -21,7 +22,7 @@ a,
 .content,
 .subscribe-container,
 .brutalist-container {
-    cursor: url('/cursor.png'), pointer;
+    cursor: var(--custom-cursor);
 }
 
 body {
