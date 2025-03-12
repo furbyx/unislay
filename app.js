@@ -136,7 +136,11 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         submitButton.disabled = true;
         buttonText.textContent = 'Subscribing...';
         
-        const response = await fetch('/api/subscribe', {
+        const apiUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api/subscribe'
+            : 'https://unislaycomingsoon.vercel.app/api/subscribe';
+        
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -160,6 +164,6 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         alert(error.message || 'Failed to subscribe. Please try again.');
     } finally {
         submitButton.disabled = false;
-        buttonText.textContent = 'JOIN';
+        buttonText.textContent = 'Subscribe';
     }
 });
