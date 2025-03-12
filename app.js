@@ -138,7 +138,7 @@ document.getElementById('subscribeForm').addEventListener('submit', async (e) =>
         
         const apiUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000/api/subscribe'
-            : 'https://unislay.comp/api/subscribe';
+            : 'https://unislay.com/api/subscribe';
         
         const response = await fetch(apiUrl, {
             method: 'POST',
