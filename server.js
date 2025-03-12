@@ -15,9 +15,10 @@ const port = process.env.PORT || 3000;
 
 // Configure CORS
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:52811', 'https://unislaycomingsoon.vercel.app'],
-    methods: ['GET', 'POST'],
-    credentials: true
+    origin: ['http://localhost:3000', 'https://unislay.com'],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type']
 }));
 
 // Configure nodemailer
